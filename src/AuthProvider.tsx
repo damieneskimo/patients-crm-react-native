@@ -40,12 +40,8 @@ export const AuthProvider: React.FC<{}> = ({children}) => {
             SecureStore.setItemAsync('user', JSON.stringify(userResponse));
           })
           .catch(error => {
-
-            console.log('error is heree');
-            console.log(error);
-            
-            // const key = Object.keys(error.response.data.errors)[0];
-            // setError(error.response.data.errors[key][0]);
+            const key = Object.keys(error.response.data.errors)[0];
+            setError(error.response.data.errors[key][0]);
           })
         },
         logout: () => {
