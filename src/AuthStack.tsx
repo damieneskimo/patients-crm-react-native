@@ -10,7 +10,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 export const AuthStack = () => {
   return (
     <Stack.Navigator initialRouteName="Login" screenOptions={screenOptions}>
-      <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'log in ' }} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ title: '' }} />
     </Stack.Navigator>
   )
 }

@@ -30,7 +30,6 @@ export const AuthProvider: React.FC<{}> = ({children}) => {
             device_name: 'mobile',
           })
           .then(response => {
-            console.log(response)
             const userResponse = {
               email: response.data.user.email,
               token: response.data.token,

@@ -5,6 +5,20 @@ export type User = {
     token?: string
 }
 
+export type Patient = {
+    id: number;
+    name: string;
+    gender: string;
+    email: string;
+    mobile: string;
+}
+
+export type Note = {
+    id: number,
+    content: string,
+    created_at: string
+}
+
 export type AuthContent = {
     user: User | null,
     setUser: (user: User) => void,
@@ -17,4 +31,5 @@ export type RootStackParamList = {
     Login: undefined;
     Notes: { patientId: string }
     PatientsList: { page: string, keywords: string} | undefined
+    PatientDetail: { id: string }
 };
