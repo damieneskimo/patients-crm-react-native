@@ -1,10 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 import { AuthContext } from '../AuthProvider'
 import { apiClient } from '../api';
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
+import { Patient, RootStackParamList } from '../types';
+import PatientListItem from '../components/PatientListItem';
 
 type PatientsListScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -16,16 +17,18 @@ type Props = {
 };
 
 const PatientsListScreen = ({ navigation }: Props) => {
-    const { user, logout } = useContext(AuthContext)
-    const [ name, setName ] = useState(null);
+    const { user } = useContext(AuthContext)
+    const [ patients, setPatients ] = useState([]);
+
   
     useEffect(() => {
         if (user !== null) {
             apiClient.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
   
-            apiClient.get('/api/user')
+            apiClient.get('/api/patients')
                 .then(response => {
-                    setName(response.data.name);
+                  // console.log(response.data.data)
+                    setPatients(response.data.data);
                 })
                 .catch(error => {
                     console.log(error.response);
@@ -34,11 +37,19 @@ const PatientsListScreen = ({ navigation }: Props) => {
     }, []);
   
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Dashboard Screen Logged In View</Text>
-        {/* <Text>User: {user.email}</Text> */}
-        <Text>User from Server: {name}</Text>
-        <Button title="Logout" onPress={() => logout()} />
+      <View>
+        <FlatList 
+          data={patients}
+          renderItem={item => {
+            return (
+              <TouchableOpacity
+                onPress={ () => navigation.navigate('PatientDetail', { id: item.item.id }) }>
+                <PatientListItem item={item.item} />
+              </TouchableOpacity>
+            )
+          }}
+          keyExtractor={(item, index) => index.toString()}
+        />
       </View>
     );
   }
