@@ -1,4 +1,5 @@
-import React, { useContext, useState, useEffect } from 'react';
+import * as React from 'react';
+import { useRef, useContext, useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList } from 'react-native';
 import { AuthContext } from '../AuthProvider'
 import { apiClient } from '../api';
@@ -18,20 +19,25 @@ type Props = {
 const NotesScreen = ({ route, navigation }: Props) => {
     const { user } = useContext(AuthContext)
     const { patientId } = route.params;
-    const [ notes, setNotes ] = useState<[Note]>();
+    const [ notes, setNotes ] = useState<Note[]>();
+    const mountedRef = useRef(true);
 
-    if (user !== null) {
-      apiClient.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-
-      apiClient.get('/api/patients/' + patientId + '/notes')
-          .then(response => {
-            console.log(response.data.data)
-              setNotes(response.data.data);
-          })
-          .catch(error => {
-              console.log(error.response);
-          })
-  }
+    useEffect(() => {
+      if (user !== null) {
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+  
+        apiClient.get('/api/patients/' + patientId + '/notes')
+            .then(response => {
+                if (! mountedRef.current) return null;
+                setNotes(response.data.data);
+            })
+            .catch(error => {
+                console.log(error.response);
+            })
+      }
+      
+      return () => { mountedRef.current = false }
+    })
   
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

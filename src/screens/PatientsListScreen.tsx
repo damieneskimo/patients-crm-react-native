@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react';
+import * as React from 'react';
+import { useRef, useContext, useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 import { AuthContext } from '../AuthProvider'
 import { apiClient } from '../api';
-
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Patient, RootStackParamList } from '../types';
 import PatientListItem from '../components/PatientListItem';
@@ -18,8 +18,8 @@ type Props = {
 
 const PatientsListScreen = ({ navigation }: Props) => {
     const { user } = useContext(AuthContext)
-    const [ patients, setPatients ] = useState([]);
-
+    const [ patients, setPatients ] = useState<Patient[]>();
+    const mountedRef = useRef(true);
   
     useEffect(() => {
         if (user !== null) {
@@ -27,6 +27,7 @@ const PatientsListScreen = ({ navigation }: Props) => {
   
             apiClient.get('/api/patients')
                 .then(response => {
+                    if (! mountedRef.current) return null;  
                   // console.log(response.data.data)
                     setPatients(response.data.data);
                 })
@@ -34,6 +35,8 @@ const PatientsListScreen = ({ navigation }: Props) => {
                     console.log(error.response);
                 })
         }
+
+        return () => { mountedRef.current = false; }
     }, []);
   
     return (
@@ -43,7 +46,7 @@ const PatientsListScreen = ({ navigation }: Props) => {
           renderItem={item => {
             return (
               <TouchableOpacity
-                onPress={ () => navigation.navigate('PatientDetail', { id: item.item.id }) }>
+                onPress={ () => navigation.navigate('PatientDetail', { id: item.item.id.toString() }) }>
                 <PatientListItem item={item.item} />
               </TouchableOpacity>
             )

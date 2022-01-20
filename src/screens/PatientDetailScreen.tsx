@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React from 'react';
+import { useRef, useState, useEffect, useContext } from 'react';
 import { View, Text, Button } from 'react-native';
 import { AuthContext } from '../AuthProvider';
 import { apiClient } from '../api';
@@ -21,6 +22,7 @@ const PatientDetailScreen = ({ route, navigation }: Props) => {
     const { user } = useContext(AuthContext);
     const { id } = route.params;
     const [ patient, setPatient ] = useState<Patient>();
+    const mountedRef = useRef(true)
 
     useEffect(() => {
         if (user !== null) {
@@ -28,12 +30,15 @@ const PatientDetailScreen = ({ route, navigation }: Props) => {
   
             apiClient.get('/api/patients/' + id)
                 .then(response => {
+                    if (! mountedRef) return null;
                     setPatient(response.data);
                 })
                 .catch(error => {
                     console.log(error.response);
                 })
         }
+
+        return () => { mountedRef.current = false };
     }, []);
 
     if (patient === undefined) {
